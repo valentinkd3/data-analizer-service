@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BeanConfig {
 
-    @Bean
     @SneakyThrows
-    public XML consumerXML(){
+    @Bean
+    public XML consumerXml() {
         return new XMLDocument(
                 getClass().getResourceAsStream("/kafka/consumer.xml").readAllBytes()
         );

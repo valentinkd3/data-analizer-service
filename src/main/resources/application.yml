@@ -20,4 +20,4 @@ spring:
 
 
 
-topics: ${KAFKA_SUBSCRIBE_TOPICS}
+topics: ${KAFKA_SUBSCRIBED_TOPICS}

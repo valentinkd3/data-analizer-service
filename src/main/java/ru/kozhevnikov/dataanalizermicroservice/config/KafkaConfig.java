@@ -27,34 +27,30 @@ public class KafkaConfig {
 
     @Bean
     public Map<String, Object> receiverProperties() {
-        Map<String, Object> props = new HashMap<>(5);
+        Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(
                 ConsumerConfig.GROUP_ID_CONFIG,
                 new TextXPath(
-                        this.settings,
-                        "//groupId"
+                        this.settings, "//groupId"
                 ).toString()
         );
         props.put(
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 new TextXPath(
-                        settings,
-                        "//keyDeserializer"
+                        this.settings, "//keyDeserializer"
                 ).toString()
         );
         props.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 new TextXPath(
-                        settings,
-                        "//valueDeserializer"
+                        this.settings, "//valueDeserializer"
                 ).toString()
         );
         props.put(
                 "spring.json.trusted.packages",
                 new TextXPath(
-                        settings,
-                        "//trustedPackages"
+                        this.settings, "//trustedPackages"
                 ).toString()
         );
         return props;
@@ -62,19 +58,19 @@ public class KafkaConfig {
 
     @Bean
     public ReceiverOptions<String, Object> receiverOptions() {
-        ReceiverOptions<String, Object> receiverOptions =
-                ReceiverOptions.create(receiverProperties());
+        ReceiverOptions<String, Object> receiverOptions = ReceiverOptions
+                .create(receiverProperties());
         return receiverOptions.subscription(topics)
-                .addAssignListener(partitions -> System.out.println("assigned " + partitions))
-                .addRevokeListener(partitions -> System.out.println("revoked " + partitions));
+                .addAssignListener(partitions ->
+                        System.out.println("onPartitionAssigned: "
+                                           + partitions))
+                .addRevokeListener(partitions ->
+                        System.out.println("onPartitionRevoked: "
+                                           + partitions));
     }
 
-    //    @Bean
-//    public KafkaReceiver<String,Object> kafkaReceiver(ReceiverOptions<String,Object> receiverOptions){
-//        return KafkaReceiver.create(receiverOptions);
-//    }
     @Bean
-    public KafkaReceiver<String, Object> kafkaReceiver() {
+    public KafkaReceiver<String, Object> receiver() {
         return KafkaReceiver.create(receiverOptions());
     }
 }
