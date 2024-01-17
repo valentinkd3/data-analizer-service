@@ -51,6 +51,7 @@ services:
     networks:
       - app
     depends_on:
+      - debezium
       - redis
       - kafka
     environment:
@@ -98,6 +99,10 @@ services:
       - .env
     ports:
       - '5437:5432'
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
     volumes:
       - db-data:/var/lib/postgresql/data
 
@@ -112,3 +117,20 @@ services:
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - redis-data:/data
+
+  debezium:
+    image: 'debezium/connect:2.4.0.Final'
+    networks:
+      - app
+    depends_on:
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - GROUP_ID=${DEBEZIUM_KAFKA_BROKER_ID}
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+    user: root
+    volumes:
+      - debezium-data:/debezium/data
+      - ./conf/:/on-startup/
